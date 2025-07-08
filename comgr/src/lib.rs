@@ -281,7 +281,7 @@ impl Comgr {
         kind: ActionKind,
         action: &ActionInfo,
         data_set: &DataSet,
-    ) -> Result<DataSet, Error> {
+    ) -> Result<DataSet<'_>, Error> {
         let result = DataSet::new(self)?;
         call_dispatch!(self => amd_comgr_do_action(kind, action, data_set, result));
         Ok(result)
