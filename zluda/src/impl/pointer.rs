@@ -7,7 +7,7 @@ pub(crate) unsafe fn get_attribute(
     attribute: hipPointer_attribute,
     ptr: hipDeviceptr_t,
 ) -> hipError_t {
-    if data == ptr::null_mut() {
+    if data.is_null() {
         return hipError_t::ErrorInvalidValue;
     }
     match attribute {

@@ -23,14 +23,14 @@ pub(crate) fn nvmlInit_v2() -> cuda_types::nvml::nvmlReturn_t {
     nvmlReturn_t::SUCCESS
 }
 
-const VERSION: &'static CStr = c"550.77";
+const VERSION: &CStr = c"550.77";
 
 #[allow(non_snake_case)]
 pub(crate) fn nvmlSystemGetDriverVersion(
     result: *mut ::core::ffi::c_char,
     length: ::core::ffi::c_uint,
 ) -> cuda_types::nvml::nvmlReturn_t {
-    if result == ptr::null_mut() {
+    if result.is_null() {
         return nvmlReturn_t::ERROR_INVALID_ARGUMENT;
     }
     let version = VERSION.to_bytes_with_nul();

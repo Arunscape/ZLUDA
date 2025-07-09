@@ -1,4 +1,3 @@
-use crate::r#impl::driver;
 
 use super::{module, ZludaObject, FromCuda};
 use cuda_types::cuda::*;

@@ -24,7 +24,7 @@ fn main() -> Result<(), VarError> {
     helpers_dir.push("tests");
     helpers_dir.push("helpers");
     let helpers_dir_as_string = helpers_dir.to_string_lossy();
-    println!("cargo:rerun-if-changed={}", helpers_dir_as_string);
+    println!("cargo:rerun-if-changed={helpers_dir_as_string}");
     for rust_file in fs::read_dir(&helpers_dir).unwrap().filter_map(rust_file) {
         let full_file_path = format!(
             "{}{}{}",
@@ -36,7 +36,7 @@ fn main() -> Result<(), VarError> {
         if debug {
             rustc_cmd.arg("-g");
         }
-        rustc_cmd.arg(format!("-Lnative={}", helpers_dir_as_string));
+        rustc_cmd.arg(format!("-Lnative={helpers_dir_as_string}"));
         if !is_msvc {
             // HACK ALERT
             // I have no idea why the extra library below have to be linked
@@ -44,13 +44,13 @@ fn main() -> Result<(), VarError> {
         }
         rustc_cmd
             .arg("-C")
-            .arg(format!("opt-level={}", opt_level))
+            .arg(format!("opt-level={opt_level}"))
             .arg("-L")
-            .arg(format!("{}", out_dir))
+            .arg(out_dir.to_string())
             .arg("--out-dir")
-            .arg(format!("{}", out_dir))
+            .arg(out_dir.to_string())
             .arg("--target")
-            .arg(format!("{}", target))
+            .arg(target.to_string())
             .arg(full_file_path);
         assert!(rustc_cmd.status().unwrap().success());
     }

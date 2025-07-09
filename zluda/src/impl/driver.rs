@@ -25,7 +25,7 @@ pub(crate) struct Device {
 }
 
 impl Device {
-    pub(crate) fn primary_context<'a>(&'a self) -> (&'a context::Context, CUcontext) {
+    pub(crate) fn primary_context(&self) -> (&context::Context, CUcontext) {
         unsafe {
             (
                 self.primary_context.data.assume_init_ref(),
@@ -44,7 +44,7 @@ pub(crate) fn device(dev: i32) -> Result<&'static Device, CUerror> {
 
 pub(crate) fn global_state() -> Result<&'static GlobalState, CUerror> {
     static GLOBAL_STATE: OnceLock<Result<GlobalState, CUerror>> = OnceLock::new();
-    fn cast_slice<'a>(bytes: &'a [i8]) -> &'a [u8] {
+    fn cast_slice(bytes: &[i8]) -> &[u8] {
         unsafe { slice::from_raw_parts(bytes.as_ptr().cast(), bytes.len()) }
     }
     GLOBAL_STATE
@@ -149,7 +149,7 @@ impl ::dark_api::cuda::CudaDarkApi for DarkApi {
     unsafe extern "system" fn get_unknown_buffer1(
         ptr: *mut *mut std::ffi::c_void,
         size: *mut usize,
-    ) -> () {
+    ) {
         *ptr = UNKNOWN_BUFFER1.buffer.get() as *mut std::ffi::c_void;
         *size = UNKNOWN_BUFFER1.len();
     }
@@ -157,7 +157,7 @@ impl ::dark_api::cuda::CudaDarkApi for DarkApi {
     unsafe extern "system" fn get_unknown_buffer2(
         ptr: *mut *mut std::ffi::c_void,
         size: *mut usize,
-    ) -> () {
+    ) {
         *ptr = UNKNOWN_BUFFER2.buffer.get() as *mut std::ffi::c_void;
         *size = UNKNOWN_BUFFER2.len();
     }
@@ -174,7 +174,7 @@ impl ::dark_api::cuda::CudaDarkApi for DarkApi {
             ),
         >,
     ) -> CUresult {
-        let _ctx = if cu_ctx.0 != ptr::null_mut() {
+        let _ctx = if !cu_ctx.0.is_null() {
             cu_ctx
         } else {
             let mut current_ctx: CUcontext = CUcontext(ptr::null_mut());
@@ -214,7 +214,7 @@ impl ::dark_api::cuda::CudaDarkApi for DarkApi {
         key: *mut c_void,
     ) -> CUresult {
         let mut _ctx: CUcontext;
-        if cu_ctx.0 == ptr::null_mut() {
+        if cu_ctx.0.is_null() {
             _ctx = context::get_current_context()?;
         } else {
             _ctx = cu_ctx

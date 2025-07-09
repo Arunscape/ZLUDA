@@ -6,7 +6,7 @@ use std::{cell::RefCell, ptr, sync::Mutex, ffi::c_void};
 
 
 thread_local! {
-    pub(crate) static STACK: RefCell<Vec<(CUcontext, hipDevice_t)>> = RefCell::new(Vec::new());
+    pub(crate) static STACK: RefCell<Vec<(CUcontext, hipDevice_t)>> = const { RefCell::new(Vec::new()) };
 }
 
 pub(crate) struct Context {
@@ -64,7 +64,7 @@ impl ContextState {
 impl Context {
     pub(crate) fn new(device: hipDevice_t) -> Self {
         Self {
-            device: device,
+            device,
             state: Mutex::new(ContextState::new()),
         }
     }
@@ -74,7 +74,7 @@ impl Context {
         fn_: impl FnOnce(&ContextState) -> CUresult,
     ) -> CUresult {
         match self.state.lock() {
-            Ok(guard) => fn_(& *guard),
+            Ok(guard) => fn_(&guard),
             Err(_) => CUresult::ERROR_UNKNOWN,
         }
     }
@@ -84,7 +84,7 @@ impl Context {
         fn_: impl FnOnce(&mut ContextState) -> CUresult,
     ) -> CUresult {
         match self.state.lock() {
-            Ok(mut guard) => fn_(&mut *guard),
+            Ok(mut guard) => fn_(&mut guard),
             Err(_) => CUresult::ERROR_UNKNOWN,
         }
     }
@@ -120,7 +120,7 @@ pub(crate) fn synchronize() -> hipError_t {
 }
 
 pub(crate) fn set_current(raw_ctx: CUcontext) -> CUresult {
-    let new_device = if raw_ctx.0 == ptr::null_mut() {
+    let new_device = if raw_ctx.0.is_null() {
         STACK.with(|stack| {
             let mut stack = stack.borrow_mut();
             if let Some((_, old_device)) = stack.pop() {

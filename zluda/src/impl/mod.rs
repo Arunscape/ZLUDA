@@ -113,7 +113,7 @@ macro_rules! from_cuda_object {
 
             impl<'a> FromCuda<'a, <$type_ as ZludaObject>::CudaHandle> for &'a $type_ {
                 fn from_cuda(handle: &'a <$type_ as ZludaObject>::CudaHandle) -> Result<&'a $type_, CUerror> {
-                    Ok(as_ref(handle).as_result()?)
+                    as_ref(handle).as_result()
                 }
             }
         )*
@@ -164,7 +164,7 @@ impl<'a> FromCuda<'a, CUlimit> for hipLimit_t {
 
 impl<'a> FromCuda<'a, *const ::core::ffi::c_char> for &CStr {
     fn from_cuda(s: &'a *const ::core::ffi::c_char) -> Result<Self, CUerror> {
-        if *s != ptr::null() {
+        if !(*s).is_null() {
             Ok(unsafe { CStr::from_ptr(*s) })
         } else {
             Err(CUerror::INVALID_VALUE)
@@ -241,9 +241,9 @@ impl<T: ZludaObject> LiveCheck<T> {
     }
 }
 
-pub fn as_ref<'a, T: ZludaObject>(
-    handle: &'a T::CudaHandle,
-) -> &'a ManuallyDrop<Box<LiveCheck<T>>> {
+pub fn as_ref<T: ZludaObject>(
+    handle: &T::CudaHandle,
+) -> &ManuallyDrop<Box<LiveCheck<T>>> {
     unsafe { mem::transmute(handle) }
 }
 
