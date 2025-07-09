@@ -1,5 +1,5 @@
 use cuda_types::nvml::*;
-use std::{ffi::CStr, ptr};
+use std::ffi::CStr;
 
 #[cfg(debug_assertions)]
 pub(crate) fn unimplemented() -> nvmlReturn_t {

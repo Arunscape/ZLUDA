@@ -3,7 +3,6 @@ use hip_runtime_sys::*;
 use std::{
     ffi::CStr,
     mem::{self, ManuallyDrop, MaybeUninit},
-    ptr,
 };
 
 pub(super) mod context;

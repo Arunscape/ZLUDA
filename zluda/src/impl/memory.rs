@@ -1,5 +1,4 @@
 use hip_runtime_sys::*;
-use std::mem;
 
 pub(crate) fn alloc_v2(dptr: *mut hipDeviceptr_t, bytesize: usize) -> hipError_t {
     unsafe { hipMalloc(dptr.cast(), bytesize) }?;

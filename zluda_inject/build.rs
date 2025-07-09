@@ -46,11 +46,11 @@ fn main() -> Result<(), VarError> {
             .arg("-C")
             .arg(format!("opt-level={opt_level}"))
             .arg("-L")
-            .arg(out_dir.to_string())
+            .arg(&out_dir)
             .arg("--out-dir")
-            .arg(out_dir.to_string())
+            .arg(&out_dir)
             .arg("--target")
-            .arg(target.to_string())
+            .arg(&target)
             .arg(full_file_path);
         assert!(rustc_cmd.status().unwrap().success());
     }
